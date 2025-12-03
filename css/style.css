@@ -1489,3 +1489,142 @@ form {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ========================================
+   CORREÇÕES MOBILE - PONTUAIS
+   ======================================== */
+
+/* ----------------------------------------
+   1. HEADER RESPONSIVO
+   ---------------------------------------- */
+@media (max-width: 768px) {
+    .header {
+        padding: 0.5rem 1rem;
+        gap: 0.5rem;
+    }
+    
+    .header h1 {
+        font-size: 1.1rem;
+        white-space: nowrap;
+    }
+    
+    /* Seletor de mês compacto */
+    .month-selector {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        gap: 0.3rem;
+    }
+    
+    .month-selector .month-name {
+        max-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Botão de adicionar sempre visível */
+    .add-transaction-btn,
+    .btn-add,
+    .header .btn-primary {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    
+    /* Se o botão tiver texto, esconde no mobile e mostra só ícone */
+    .add-transaction-btn span,
+    .btn-add span {
+        display: none;
+    }
+    
+    .add-transaction-btn i,
+    .btn-add i {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+}
+
+/* ----------------------------------------
+   2. TABELA COM SCROLL HORIZONTAL
+   ---------------------------------------- */
+.table-container,
+.transactions-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+.transactions-table {
+    min-width: 600px; /* Força largura mínima */
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .table-container,
+    .transactions-table-wrapper {
+        margin: 0 -1rem;
+        padding: 0 1rem;
+        scrollbar-width: thin;
+    }
+    
+    /* Indicador visual de scroll */
+    .table-container::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to left, var(--bg-primary, #0f172a), transparent);
+        pointer-events: none;
+        opacity: 0.5;
+    }
+    
+    .transactions-table th,
+    .transactions-table td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+}
+
+/* ----------------------------------------
+   FILTROS DE TRANSAÇÕES - MOBILE
+   ---------------------------------------- */
+@media (max-width: 768px) {
+    .filters,
+    .transactions-filters,
+    .filter-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    
+    .filters select,
+    .transactions-filters select,
+    .filter-container select {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
+        width: 100%;
+    }
+    
+    /* Input de busca ocupa linha inteira */
+    .filters input[type="text"],
+    .filters input[type="search"],
+    .transactions-filters input,
+    .filter-container input {
+        grid-column: 1 / -1;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Telas muito pequenas - empilha tudo */
+@media (max-width: 400px) {
+    .filters,
+    .transactions-filters,
+    .filter-container {
+        grid-template-columns: 1fr;
+    }
+}
