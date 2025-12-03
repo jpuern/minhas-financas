@@ -121,9 +121,122 @@ body {
     text-align: center;
 }
 
+/* ========================================
+   SIDEBAR FOOTER - SYNC & BACKUP
+======================================== */
 .sidebar-footer {
     padding: 16px;
     border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sync-section,
+.backup-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.sync-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.status-dot.connected {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+}
+
+.btn-google-sync {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #4285f4, #34a853);
+    border: none;
+    color: white;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-google-sync:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+}
+
+.sync-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sync-action {
+    flex: 1;
+    padding: 8px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-sync-action:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.backup-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-backup {
+    flex: 1;
+    padding: 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    transition: var(--transition);
+}
+
+.btn-backup:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-import {
+    position: relative;
 }
 
 .btn-clear-data {
@@ -334,21 +447,10 @@ body {
     font-weight: 700;
 }
 
-.card-balance .card-value {
-    color: var(--primary-light);
-}
-
-.card-income .card-value {
-    color: var(--success);
-}
-
-.card-expense .card-value {
-    color: var(--danger);
-}
-
-.card-economy .card-value {
-    color: var(--warning);
-}
+.card-balance .card-value { color: var(--primary-light); }
+.card-income .card-value { color: var(--success); }
+.card-expense .card-value { color: var(--danger); }
+.card-economy .card-value { color: var(--warning); }
 
 /* ========================================
    DASHBOARD - GRID
@@ -467,13 +569,8 @@ body {
     font-size: 14px;
 }
 
-.transaction-amount.income {
-    color: var(--success);
-}
-
-.transaction-amount.expense {
-    color: var(--danger);
-}
+.transaction-amount.income { color: var(--success); }
+.transaction-amount.expense { color: var(--danger); }
 
 /* ========================================
    PROGRESSO MENSAL
@@ -528,7 +625,7 @@ body {
 }
 
 /* ========================================
-   TRANSAÇÕES - TABELA
+   TRANSAÇÕES - FILTROS E TABELA
 ======================================== */
 .section-header {
     margin-bottom: 24px;
@@ -566,11 +663,13 @@ body {
     background: var(--bg-card);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .transactions-table {
     width: 100%;
+    min-width: 600px;
     border-collapse: collapse;
 }
 
@@ -587,6 +686,7 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-secondary);
+    white-space: nowrap;
 }
 
 .transactions-table td {
@@ -609,6 +709,7 @@ body {
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .type-badge.income {
@@ -894,14 +995,8 @@ body {
 }
 
 @keyframes modalSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-header {
@@ -975,6 +1070,13 @@ form {
 .form-group textarea {
     min-height: 80px;
     resize: vertical;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
 .form-row {
@@ -1096,6 +1198,32 @@ form {
     background: var(--primary-dark);
 }
 
+/* Config Modal */
+.config-instructions {
+    background: var(--bg-tertiary);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.config-instructions p {
+    margin-bottom: 8px;
+}
+
+.config-instructions ol {
+    margin-left: 20px;
+    color: var(--text-secondary);
+}
+
+.config-instructions ol li {
+    margin-bottom: 4px;
+}
+
+.config-instructions a {
+    color: var(--primary);
+}
+
 /* ========================================
    TOAST NOTIFICATIONS
 ======================================== */
@@ -1123,336 +1251,20 @@ form {
 }
 
 @keyframes toastSlide {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-.toast.success {
-    border-color: var(--success);
-}
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--danger); }
+.toast.warning { border-color: var(--warning); }
 
-.toast.error {
-    border-color: var(--danger);
-}
-
-.toast.warning {
-    border-color: var(--warning);
-}
-
-.toast i {
-    font-size: 18px;
-}
-
+.toast i { font-size: 18px; }
 .toast.success i { color: var(--success); }
 .toast.error i { color: var(--danger); }
 .toast.warning i { color: var(--warning); }
 
-/* ========================================
-   EMPTY STATE
-======================================== */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-muted);
-}
-
-.empty-state i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.empty-state p {
-    font-size: 14px;
-}
-
-/* ========================================
-   RESPONSIVO
-======================================== */
-@media (max-width: 1024px) {
-    .dashboard-grid,
-    .categories-grid,
-    .reports-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .report-card.full-width {
-        grid-column: span 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-    
-    .sidebar.active {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-    
-    .menu-toggle {
-        display: block;
-    }
-    
-    .header {
-        padding: 0 16px;
-    }
-    
-    .header-right {
-        gap: 12px;
-    }
-    
-    .btn-add span {
-        display: none;
-    }
-    
-    .month-selector span {
-        min-width: auto;
-        font-size: 14px;
-    }
-    
-    .section {
-        padding: 16px;
-    }
-    
-    .summary-cards {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-    }
-    
-    .card {
-        padding: 16px;
-    }
-    
-    .card-value {
-        font-size: 18px;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .filters {
-        flex-direction: column;
-    }
-    
-    .filter-select,
-    .search-input {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .transactions-table {
-        font-size: 13px;
-    }
-    
-    .transactions-table th,
-    .transactions-table td {
-        padding: 12px 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .summary-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .type-toggle {
-        flex-direction: column;
-    }
-}
-
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--bg-tertiary);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
-
-/* ========================================
-   SIDEBAR FOOTER - SYNC & BACKUP
-======================================== */
-.sidebar-footer {
-    padding: 16px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.sync-section,
-.backup-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.section-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
-}
-
-.sync-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--text-muted);
-}
-
-.status-dot.connected {
-    background: var(--success);
-    box-shadow: 0 0 8px var(--success);
-}
-
-.btn-google-sync {
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg, #4285f4, #34a853);
-    border: none;
-    color: white;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-weight: 500;
-    transition: var(--transition);
-}
-
-.btn-google-sync:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
-}
-
-.sync-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-sync-action {
-    flex: 1;
-    padding: 8px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-sync-action:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-.backup-buttons {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-backup {
-    flex: 1;
-    padding: 10px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 12px;
-    transition: var(--transition);
-}
-
-.btn-backup:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.btn-import {
-    position: relative;
-}
-
-/* Config Modal */
-.config-instructions {
-    background: var(--bg-tertiary);
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 13px;
-}
-
-.config-instructions p {
-    margin-bottom: 8px;
-}
-
-.config-instructions ol {
-    margin-left: 20px;
-    color: var(--text-secondary);
-}
-
-.config-instructions ol li {
-    margin-bottom: 4px;
-}
-
-.config-instructions a {
-    color: var(--primary);
-}
-
-.form-group small {
-    display: block;
-    margin-top: 4px;
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-/* Botão de Sync */
-#syncBtn.syncing svg {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Notificação de Sync */
+/* Sync Notification */
 .sync-notification {
     position: fixed;
     top: 20px;
@@ -1480,151 +1292,204 @@ form {
     color: white;
 }
 
-/* Animação do botão sync */
-#syncBtn.syncing i {
-    animation: spin 1s linear infinite;
+/* ========================================
+   EMPTY STATE
+======================================== */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
 }
 
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+/* ========================================
+   ANIMAÇÕES
+======================================== */
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 
-/* ========================================
-   CORREÇÕES MOBILE - PONTUAIS
-   ======================================== */
+#syncBtn.syncing i {
+    animation: spin 1s linear infinite;
+}
 
-/* ----------------------------------------
-   1. HEADER RESPONSIVO
-   ---------------------------------------- */
-@media (max-width: 768px) {
-    .header {
-        padding: 0.5rem 1rem;
-        gap: 0.5rem;
+/* ========================================
+   RESPONSIVO
+======================================== */
+@media (max-width: 1024px) {
+    .dashboard-grid,
+    .categories-grid,
+    .reports-grid {
+        grid-template-columns: 1fr;
     }
     
-    .header h1 {
+    .report-card.full-width {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Sidebar */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+    
+    /* Header */
+    .header {
+        padding: 0 1rem;
+        height: 60px;
+    }
+    
+    .header-left h1 {
         font-size: 1.1rem;
         white-space: nowrap;
     }
     
-    /* Seletor de mês compacto */
+    .header-right {
+        gap: 0.75rem;
+    }
+    
+    /* Month Selector Compacto */
     .month-selector {
         padding: 0.4rem 0.6rem;
+        gap: 0.25rem;
+    }
+    
+    .month-selector span {
+        min-width: auto;
         font-size: 0.85rem;
-        gap: 0.3rem;
     }
     
-    .month-selector .month-name {
-        max-width: 60px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    /* Botão Add - só ícone */
+    .btn-add {
+        padding: 0.6rem;
     }
     
-    /* Botão de adicionar sempre visível */
-    .add-transaction-btn,
-    .btn-add,
-    .header .btn-primary {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-    
-    /* Se o botão tiver texto, esconde no mobile e mostra só ícone */
-    .add-transaction-btn span,
     .btn-add span {
         display: none;
     }
     
-    .add-transaction-btn i,
     .btn-add i {
         margin: 0;
         font-size: 1.1rem;
     }
-}
-
-/* ----------------------------------------
-   2. TABELA COM SCROLL HORIZONTAL
-   ---------------------------------------- */
-.table-container,
-.transactions-table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
-
-.transactions-table {
-    min-width: 600px; /* Força largura mínima */
-    width: 100%;
-}
-
-@media (max-width: 768px) {
-    .table-container,
-    .transactions-table-wrapper {
-        margin: 0 -1rem;
-        padding: 0 1rem;
-        scrollbar-width: thin;
+    
+    /* Sections */
+    .section {
+        padding: 1rem;
     }
     
-    /* Indicador visual de scroll */
-    .table-container::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        width: 20px;
-        background: linear-gradient(to left, var(--bg-primary, #0f172a), transparent);
-        pointer-events: none;
-        opacity: 0.5;
+    /* Summary Cards */
+    .summary-cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
     }
     
-    .transactions-table th,
-    .transactions-table td {
-        padding: 0.6rem 0.5rem;
-        font-size: 0.8rem;
-        white-space: nowrap;
+    .card {
+        padding: 16px;
     }
-}
-
-/* ----------------------------------------
-   FILTROS DE TRANSAÇÕES - MOBILE
-   ---------------------------------------- */
-@media (max-width: 768px) {
-    .filters,
-    .transactions-filters,
-    .filter-container {
+    
+    .card-value {
+        font-size: 18px;
+    }
+    
+    /* Filtros */
+    .filters {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 0.5rem;
     }
     
-    .filters select,
-    .transactions-filters select,
-    .filter-container select {
+    .filter-select {
+        min-width: auto;
         padding: 0.6rem 0.75rem;
         font-size: 0.85rem;
-        width: 100%;
     }
     
-    /* Input de busca ocupa linha inteira */
-    .filters input[type="text"],
-    .filters input[type="search"],
-    .transactions-filters input,
-    .filter-container input {
+    .search-input {
         grid-column: 1 / -1;
+        min-width: auto;
         padding: 0.6rem 0.75rem;
         font-size: 0.85rem;
+    }
+    
+    /* Tabela */
+    .transactions-table th,
+    .transactions-table td {
+        padding: 12px 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* Forms */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Toast */
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+    
+    .toast {
+        min-width: auto;
     }
 }
 
-/* Telas muito pequenas - empilha tudo */
-@media (max-width: 400px) {
-    .filters,
-    .transactions-filters,
-    .filter-container {
+@media (max-width: 480px) {
+    .summary-cards {
         grid-template-columns: 1fr;
     }
+    
+    .type-toggle {
+        flex-direction: column;
+    }
+    
+    .filters {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADA
+======================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }

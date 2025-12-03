@@ -38,12 +38,6 @@ const monthNames = [
 ];
 
 // ========================================
-// CONFIGURAÇÃO GOOGLE SHEETS
-// ========================================
-
-//let GOOGLE_SCRIPT_URL = localStorage.getItem('googleScriptUrl') || '';
-
-// ========================================
 // CONFIGURAÇÃO AUTO-SYNC
 // ========================================
 
@@ -1087,7 +1081,6 @@ const GOOGLE_CONFIG = {
     CLIENT_ID: '', // Seu Client ID do Google
     SPREADSHEET_ID: '1ASyZ3HjbBqo-nelZbbGlGphQusaBsCLl2emoswjQJSo', // ID da planilha
     SCOPES: 'https://www.googleapis.com/auth/spreadsheets',
-    // GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwQgDXJvp_aEKKZaR_K6fvmR55vHb9qbM0R7tBw3GsbeUIR1sp31DbVVu0CYis5sSYK/exec'
 };
 
 let googleAuth = null;
@@ -1165,96 +1158,96 @@ function updateGoogleButtonState(isConnected) {
     }
 }
 
-// Exporta para Google Sheets
-async function syncToGoogleSheets() {
-    if (!googleAuth?.isSignedIn.get()) {
-        await googleSignIn();
-        return;
-    }
+// // Exporta para Google Sheets
+// async function syncToGoogleSheets() {
+//     if (!googleAuth?.isSignedIn.get()) {
+//         await googleSignIn();
+//         return;
+//     }
     
-    if (!GOOGLE_CONFIG.SPREADSHEET_ID) {
-        showToast('Configure o ID da planilha primeiro', 'warning');
-        openGoogleConfigModal();
-        return;
-    }
+//     if (!GOOGLE_CONFIG.SPREADSHEET_ID) {
+//         showToast('Configure o ID da planilha primeiro', 'warning');
+//         openGoogleConfigModal();
+//         return;
+//     }
     
-    showToast('Sincronizando...', 'warning');
+//     showToast('Sincronizando...', 'warning');
     
-    try {
-        // Prepara dados das transações
-        const transactionRows = [
-            ['ID', 'Tipo', 'Descrição', 'Valor', 'Data', 'Categoria ID', 'Categoria Nome', 'Observações', 'Criado Em']
-        ];
+//     try {
+//         // Prepara dados das transações
+//         const transactionRows = [
+//             ['ID', 'Tipo', 'Descrição', 'Valor', 'Data', 'Categoria ID', 'Categoria Nome', 'Observações', 'Criado Em']
+//         ];
         
-        state.transactions.forEach(t => {
-            const category = getCategoryById(t.categoryId);
-            transactionRows.push([
-                t.id.toString(),
-                t.type,
-                t.description,
-                t.amount,
-                t.date,
-                t.categoryId?.toString() || '',
-                category?.name || '',
-                t.notes || '',
-                t.createdAt || ''
-            ]);
-        });
+//         state.transactions.forEach(t => {
+//             const category = getCategoryById(t.categoryId);
+//             transactionRows.push([
+//                 t.id.toString(),
+//                 t.type,
+//                 t.description,
+//                 t.amount,
+//                 t.date,
+//                 t.categoryId?.toString() || '',
+//                 category?.name || '',
+//                 t.notes || '',
+//                 t.createdAt || ''
+//             ]);
+//         });
         
-        // Prepara dados das categorias
-        const categoryRows = [
-            ['ID', 'Tipo', 'Nome', 'Ícone', 'Cor']
-        ];
+//         // Prepara dados das categorias
+//         const categoryRows = [
+//             ['ID', 'Tipo', 'Nome', 'Ícone', 'Cor']
+//         ];
         
-        ['income', 'expense'].forEach(type => {
-            state.categories[type].forEach(c => {
-                categoryRows.push([
-                    c.id.toString(),
-                    type,
-                    c.name,
-                    c.icon,
-                    c.color
-                ]);
-            });
-        });
+//         ['income', 'expense'].forEach(type => {
+//             state.categories[type].forEach(c => {
+//                 categoryRows.push([
+//                     c.id.toString(),
+//                     type,
+//                     c.name,
+//                     c.icon,
+//                     c.color
+//                 ]);
+//             });
+//         });
         
-        // Limpa e atualiza aba de Transações
-        await gapi.client.sheets.spreadsheets.values.clear({
-            spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
-            range: 'Transações!A:I'
-        });
+//         // Limpa e atualiza aba de Transações
+//         await gapi.client.sheets.spreadsheets.values.clear({
+//             spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
+//             range: 'Transações!A:I'
+//         });
         
-        await gapi.client.sheets.spreadsheets.values.update({
-            spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
-            range: 'Transações!A1',
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: transactionRows }
-        });
+//         await gapi.client.sheets.spreadsheets.values.update({
+//             spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
+//             range: 'Transações!A1',
+//             valueInputOption: 'USER_ENTERED',
+//             resource: { values: transactionRows }
+//         });
         
-        // Limpa e atualiza aba de Categorias
-        await gapi.client.sheets.spreadsheets.values.clear({
-            spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
-            range: 'Categorias!A:E'
-        });
+//         // Limpa e atualiza aba de Categorias
+//         await gapi.client.sheets.spreadsheets.values.clear({
+//             spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
+//             range: 'Categorias!A:E'
+//         });
         
-        await gapi.client.sheets.spreadsheets.values.update({
-            spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
-            range: 'Categorias!A1',
-            valueInputOption: 'USER_ENTERED',
-            resource: { values: categoryRows }
-        });
+//         await gapi.client.sheets.spreadsheets.values.update({
+//             spreadsheetId: GOOGLE_CONFIG.SPREADSHEET_ID,
+//             range: 'Categorias!A1',
+//             valueInputOption: 'USER_ENTERED',
+//             resource: { values: categoryRows }
+//         });
         
-        // Salva timestamp da última sincronização
-        localStorage.setItem('lastGoogleSync', new Date().toISOString());
-        updateLastSyncDisplay();
+//         // Salva timestamp da última sincronização
+//         localStorage.setItem('lastGoogleSync', new Date().toISOString());
+//         updateLastSyncDisplay();
         
-        showToast('Sincronizado com Google Sheets!', 'success');
+//         showToast('Sincronizado com Google Sheets!', 'success');
         
-    } catch (error) {
-        console.error('Erro ao sincronizar:', error);
-        showToast('Erro ao sincronizar: ' + error.message, 'error');
-    }
-}
+//     } catch (error) {
+//         console.error('Erro ao sincronizar:', error);
+//         showToast('Erro ao sincronizar: ' + error.message, 'error');
+//     }
+// }
 
 // Importa do Google Sheets (via Apps Script)
 async function importFromGoogleSheets() {
@@ -1416,8 +1409,7 @@ function scheduleSync() {
     }, AUTO_SYNC_CONFIG.debounceTime);
 }
 
-
-// Atualiza a função syncToGoogleSheets para aceitar modo silencioso
+// Sincroniza com Google Sheets via Apps Script
 async function syncToGoogleSheets(silent = false) {
     if (!GOOGLE_SCRIPT_URL) {
         if (!silent) openGoogleConfigModal();
@@ -1432,58 +1424,10 @@ async function syncToGoogleSheets(silent = false) {
             categoryName: getCategoryById(t.categoryId)?.name || ''
         }));
         
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'sync',
-                transactions: transactionsWithCategoryNames,
-                categories: state.categories
-            })
-        });
-        
-        const now = new Date().toISOString();
-        localStorage.setItem('lastGoogleSync', now);
-        updateLastSyncDisplay();
-        updateGoogleButtonState(true);
-        
-        if (!silent) {
-            showToast('Sincronizado com Google Sheets!', 'success');
-        } else {
-            console.log('✅ Sync automático concluído:', now);
-        }
-        
-    } catch (error) {
-        console.error('Erro ao sincronizar:', error);
-        if (!silent) {
-            showToast('Erro ao sincronizar. Verifique a URL.', 'error');
-        }
-    }
-}
-
-// ===== SINCRONIZAÇÃO COM GOOGLE SHEETS =====
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQgDXJvp_aEKKZaR_K6fvmR55vHb9qbM0R7tBw3GsbeUIR1sp31DbVVu0CYis5sSYK/exec';
-
-async function syncWithGoogleSheets() {
-    const syncBtn = document.getElementById('syncBtn');
-    
-    if (syncBtn) {
-        syncBtn.classList.add('syncing');
-        syncBtn.disabled = true;
-    }
-    
-    try {
-        // CHAVES CORRETAS DO APP
-        const transactions = JSON.parse(localStorage.getItem('financas_transactions') || '[]');
-        const categories = JSON.parse(localStorage.getItem('financas_categories') || '{}');
-        
         const payload = {
             action: 'sync',
-            transactions: transactions,
-            categories: categories
+            transactions: transactionsWithCategoryNames,
+            categories: state.categories
         };
         
         // Usando GET para evitar CORS
@@ -1492,20 +1436,28 @@ async function syncWithGoogleSheets() {
         const result = await response.json();
         
         if (result.success) {
-            showNotification('✅ Sincronizado! ' + transactions.length + ' transações enviadas', 'success');
+            const now = new Date().toISOString();
+            localStorage.setItem('lastGoogleSync', now);
+            updateLastSyncDisplay();
+            updateGoogleButtonState(true);
+            
+            if (!silent) {
+                showToast('Sincronizado com Google Sheets!', 'success');
+            } else {
+                console.log('✅ Sync automático concluído:', now);
+            }
         } else {
-            showNotification('❌ Erro: ' + result.error, 'error');
+            throw new Error(result.error || 'Erro desconhecido');
         }
         
     } catch (error) {
-        showNotification('❌ Erro de conexão: ' + error.message, 'error');
-    } finally {
-        if (syncBtn) {
-            syncBtn.classList.remove('syncing');
-            syncBtn.disabled = false;
+        console.error('Erro ao sincronizar:', error);
+        if (!silent) {
+            showToast('Erro ao sincronizar. Verifique a conexão.', 'error');
         }
     }
 }
+
 
 // Função de notificação (se não existir)
 function showNotification(message, type = 'success') {
@@ -1530,6 +1482,9 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Event listener do botão
-document.getElementById('syncBtn')?.addEventListener('click', syncWithGoogleSheets);
+// Event listener do botão sync
+document.getElementById('syncBtn')?.addEventListener('click', () => syncToGoogleSheets(false));
 
+
+// ===== SINCRONIZAÇÃO COM GOOGLE SHEETS =====
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQgDXJvp_aEKKZaR_K6fvmR55vHb9qbM0R7tBw3GsbeUIR1sp31DbVVu0CYis5sSYK/exec';
