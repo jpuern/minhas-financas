@@ -1083,8 +1083,8 @@ function mergeImportData(file) {
 
 const GOOGLE_CONFIG = {
     // Você precisará configurar estes valores
-    API_KEY: 'AIzaSyBB4J1WmlP700Vbwcl8YM9WMkWbV3O5LwM', // Sua API Key do Google
-    CLIENT_ID: '959778644988-htm112vppdjpluupq1qtd1ua4ntl8upr.apps.googleusercontent.com', // Seu Client ID do Google
+    API_KEY: '', // Sua API Key do Google
+    CLIENT_ID: '', // Seu Client ID do Google
     SPREADSHEET_ID: '1ASyZ3HjbBqo-nelZbbGlGphQusaBsCLl2emoswjQJSo', // ID da planilha
     SCOPES: 'https://www.googleapis.com/auth/spreadsheets',
     // GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwQgDXJvp_aEKKZaR_K6fvmR55vHb9qbM0R7tBw3GsbeUIR1sp31DbVVu0CYis5sSYK/exec'
@@ -1532,4 +1532,5 @@ function showNotification(message, type = 'success') {
 
 // Event listener do botão
 document.getElementById('syncBtn')?.addEventListener('click', syncWithGoogleSheets);
+
 
