@@ -33,8 +33,8 @@ const state = {
 
 // Meses em português
 const monthNames = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    'Jan', 'Fev', 'Mar', 'Abr', 'Maio', 'Jun',
+    'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
 ];
 
 // ========================================
@@ -1532,5 +1532,4 @@ function showNotification(message, type = 'success') {
 
 // Event listener do botão
 document.getElementById('syncBtn')?.addEventListener('click', syncWithGoogleSheets);
-
 
