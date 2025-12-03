@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Finanças | Controle Financeiro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <span>Minhas Finanças</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="transacoes">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transações</span>
+                </a>
+                <a href="#" class="nav-item" data-section="categorias">
+                    <i class="fas fa-tags"></i>
+                    <span>Categorias</span>
+                </a>
+                <a href="#" class="nav-item" data-section="relatorios">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Relatórios</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <!-- Sync Google -->
+                <div class="sync-section">
+                    <div class="sync-header">
+                        <span class="status-dot" id="googleStatus"></span>
+                        <span id="lastSyncTime">Não sincronizado</span>
+                    </div>
+                    <button class="btn-google-sync" id="googleSyncBtn" onclick="syncToGoogleSheets()">
+                        <i class="fab fa-google"></i>
+                        <span>Conectar Google</span>
+                    </button>
+                    <div class="sync-actions">
+                        <button class="btn-sync-action" onclick="importFromGoogleSheets()" title="Importar do Google">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </button>
+                        <button class="btn-sync-action" id="syncBtn" title="Sincronizar com Google Sheets">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn-sync-action" onclick="openGoogleConfigModal()" title="Configurações">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            
+                <!-- Backup Local -->
+                <div class="backup-section">
+                    <span class="section-label">Backup Local</span>
+                    <div class="backup-buttons">
+                        <button class="btn-backup" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            <span>Exportar</span>
+                        </button>
+                        <label class="btn-backup btn-import">
+                            <i class="fas fa-upload"></i>
+                            <span>Importar</span>
+                            <input type="file" id="importFile" accept=".json" onchange="importData(this.files[0])" hidden>
+                        </label>
+                    </div>
+                </div>
+            
+                <!-- Limpar Dados -->
+                <button class="btn-clear-data" id="clearData">
+                    <i class="fas fa-trash"></i>
+                    <span>Limpar Dados</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="month-selector">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <span id="currentMonth">Dezembro 2025</span>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <button class="btn-add" id="btnAddTransaction">
+                        <i class="fas fa-plus"></i>
+                        <span>Nova Transação</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section class="section dashboard-section active" id="dashboard">
+                <!-- Cards de Resumo -->
+                <div class="summary-cards">
+                    <div class="card card-balance">
+                        <div class="card-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Saldo Atual</span>
+                            <span class="card-value" id="totalBalance">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="card card-income">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Receitas</span>
+                            <span class="card-value" id="totalIncome">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="card card-expense">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Despesas</span>
+                            <span class="card-value" id="totalExpense">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="card card-economy">
+                        <div class="card-icon">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Economia</span>
+                            <span class="card-value" id="totalEconomy">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráficos e Últimas Transações -->
+                <div class="dashboard-grid">
+                    <!-- Gráfico de Despesas por Categoria -->
+                    <div class="chart-container">
+                        <h3><i class="fas fa-chart-pie"></i> Despesas por Categoria</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                        <div class="chart-legend" id="chartLegend"></div>
+                    </div>
+
+                    <!-- Últimas Transações -->
+                    <div class="recent-transactions">
+                        <h3><i class="fas fa-clock"></i> Últimas Transações</h3>
+                        <div class="transactions-list" id="recentTransactionsList">
+                            <div class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <p>Nenhuma transação registrada</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progresso Mensal -->
+                <div class="monthly-progress">
+                    <h3><i class="fas fa-chart-line"></i> Progresso Mensal</h3>
+                    <div class="progress-bars">
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Receitas</span>
+                                <span id="incomeProgress">R$ 0,00</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill income" id="incomeBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>Despesas</span>
+                                <span id="expenseProgress">R$ 0,00</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill expense" id="expenseBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transações Section -->
+            <section class="section transacoes-section" id="transacoes">
+                <div class="section-header">
+                    <div class="filters">
+                        <select id="filterType" class="filter-select">
+                            <option value="all">Todos os tipos</option>
+                            <option value="income">Receitas</option>
+                            <option value="expense">Despesas</option>
+                        </select>
+                        <select id="filterCategory" class="filter-select">
+                            <option value="all">Todas as categorias</option>
+                        </select>
+                        <input type="text" id="searchTransaction" class="search-input" placeholder="Buscar transação...">
+                    </div>
+                </div>
+                <div class="transactions-table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <tr class="empty-row">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <i class="fas fa-receipt"></i>
+                                        <p>Nenhuma transação encontrada</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Categorias Section -->
+            <section class="section categorias-section" id="categorias">
+                <div class="categories-grid">
+                    <div class="categories-column">
+                        <h3><i class="fas fa-arrow-up"></i> Categorias de Receita</h3>
+                        <div class="categories-list" id="incomeCategoriesList"></div>
+                        <button class="btn-add-category" data-type="income">
+                            <i class="fas fa-plus"></i> Adicionar Categoria
+                        </button>
+                    </div>
+                    <div class="categories-column">
+                        <h3><i class="fas fa-arrow-down"></i> Categorias de Despesa</h3>
+                        <div class="categories-list" id="expenseCategoriesList"></div>
+                        <button class="btn-add-category" data-type="expense">
+                            <i class="fas fa-plus"></i> Adicionar Categoria
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Relatórios Section -->
+            <section class="section relatorios-section" id="relatorios">
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <h3><i class="fas fa-calendar-alt"></i> Resumo Anual</h3>
+                        <div class="report-content">
+                            <canvas id="yearlyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h3><i class="fas fa-list-ol"></i> Top Despesas</h3>
+                        <div class="top-expenses-list" id="topExpensesList"></div>
+                    </div>
+                    <div class="report-card full-width">
+                        <h3><i class="fas fa-table"></i> Balanço por Categoria</h3>
+                        <div class="category-balance-table">
+                            <table id="categoryBalanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>Categoria</th>
+                                        <th>Total</th>
+                                        <th>% do Total</th>
+                                        <th>Média Mensal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryBalanceBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Transação -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nova Transação</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="transactionForm">
+                <input type="hidden" id="transactionId">
+                <div class="form-group">
+                    <label>Tipo de Transação</label>
+                    <div class="type-toggle">
+                        <button type="button" class="type-btn active" data-type="income">
+                            <i class="fas fa-arrow-up"></i> Receita
+                        </button>
+                        <button type="button" class="type-btn" data-type="expense">
+                            <i class="fas fa-arrow-down"></i> Despesa
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <input type="text" id="description" required placeholder="Ex: Salário, Aluguel, Mercado...">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="amount">Valor (R$)</label>
+                        <input type="text" id="amount" required placeholder="0,00">
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Data</label>
+                        <input type="date" id="date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="category">Categoria</label>
+                    <select id="category" required>
+                        <option value="">Selecione uma categoria</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Observações (opcional)</label>
+                    <textarea id="notes" placeholder="Adicione detalhes sobre esta transação..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelTransaction">Cancelar</button>
+                    <button type="submit" class="btn btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Categoria -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2 id="categoryModalTitle">Nova Categoria</h2>
+                <button class="modal-close" id="closeCategoryModal">&times;</button>
+            </div>
+            <form id="categoryForm">
+                <input type="hidden" id="categoryType">
+                <div class="form-group">
+                    <label for="categoryName">Nome da Categoria</label>
+                    <input type="text" id="categoryName" required placeholder="Nome da categoria">
+                </div>
+                <div class="form-group">
+                    <label for="categoryIcon">Ícone</label>
+                    <div class="icon-picker" id="iconPicker">
+                        <button type="button" class="icon-option active" data-icon="fas fa-question"><i class="fas fa-question"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-briefcase"><i class="fas fa-briefcase"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-home"><i class="fas fa-home"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-car"><i class="fas fa-car"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-utensils"><i class="fas fa-utensils"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-shopping-cart"><i class="fas fa-shopping-cart"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-heartbeat"><i class="fas fa-heartbeat"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-graduation-cap"><i class="fas fa-graduation-cap"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-gamepad"><i class="fas fa-gamepad"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-gift"><i class="fas fa-gift"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-plane"><i class="fas fa-plane"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-mobile-alt"><i class="fas fa-mobile-alt"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-bolt"><i class="fas fa-bolt"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-tint"><i class="fas fa-tint"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-wifi"><i class="fas fa-wifi"></i></button>
+                        <button type="button" class="icon-option" data-icon="fas fa-chart-line"><i class="fas fa-chart-line"></i></button>
+                    </div>
+                    <input type="hidden" id="categoryIcon" value="fas fa-question">
+                </div>
+                <div class="form-group">
+                    <label for="categoryColor">Cor</label>
+                    <div class="color-picker" id="colorPicker">
+                        <button type="button" class="color-option active" data-color="#4CAF50" style="background:#4CAF50"></button>
+                        <button type="button" class="color-option" data-color="#2196F3" style="background:#2196F3"></button>
+                        <button type="button" class="color-option" data-color="#FF9800" style="background:#FF9800"></button>
+                        <button type="button" class="color-option" data-color="#E91E63" style="background:#E91E63"></button>
+                        <button type="button" class="color-option" data-color="#9C27B0" style="background:#9C27B0"></button>
+                        <button type="button" class="color-option" data-color="#00BCD4" style="background:#00BCD4"></button>
+                        <button type="button" class="color-option" data-color="#795548" style="background:#795548"></button>
+                        <button type="button" class="color-option" data-color="#607D8B" style="background:#607D8B"></button>
+                    </div>
+                    <input type="hidden" id="categoryColor" value="#4CAF50">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelCategory">Cancelar</button>
+                    <button type="submit" class="btn btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Modal Configuração Google -->
+    <div class="modal" id="googleConfigModal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2><i class="fab fa-google"></i> Configurar Google Sheets</h2>
+                <button class="modal-close" onclick="closeGoogleConfigModal()">&times;</button>
+            </div>
+            <form onsubmit="event.preventDefault(); saveGoogleConfig();">
+                <div class="config-instructions">
+                    <p><strong>📋 Como configurar:</strong></p>
+                    <ol>
+                        <li>Acesse <a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a></li>
+                        <li>Crie um projeto e ative a Google Sheets API</li>
+                        <li>Crie credenciais OAuth 2.0</li>
+                        <li>Crie uma planilha com abas: <strong>Transações</strong> e <strong>Categorias</strong></li>
+                    </ol>
+                </div>
+    
+                <div class="form-group">
+                    <label for="googleSpreadsheetId">ID da Planilha *</label>
+                    <input type="text" id="googleSpreadsheetId"
+                        placeholder="Ex: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms">
+                    <small>Encontre na URL da planilha:
+                        docs.google.com/spreadsheets/d/<strong>[ID_AQUI]</strong>/edit</small>
+                </div>
+    
+                <div class="form-group">
+                    <label for="googleApiKey">API Key (opcional para sync completo)</label>
+                    <input type="text" id="googleApiKey" placeholder="Sua API Key">
+                </div>
+    
+                <div class="form-group">
+                    <label for="googleClientId">Client ID (opcional para sync completo)</label>
+                    <input type="text" id="googleClientId" placeholder="Seu Client ID">
+                </div>
+    
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeGoogleConfigModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
