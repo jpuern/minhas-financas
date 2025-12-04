@@ -201,9 +201,74 @@ function handleNavigation(e) {
     if (section === 'relatorios') updateReportsUI();
 }
 
+// function toggleSidebar() {
+//     document.querySelector('.sidebar').classList.toggle('active');
+// }
+// ========================================
+// SIDEBAR MOBILE
+// ========================================
 function toggleSidebar() {
-    document.querySelector('.sidebar').classList.toggle('active');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const body = document.body;
+    
+    const isOpen = sidebar.classList.contains('active');
+    
+    if (isOpen) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
 }
+
+function openSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    sidebar.classList.add('active');
+    overlay.classList.add('active');
+    document.body.classList.add('sidebar-open');
+}
+
+function closeSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
+}
+
+// Event Listeners para fechar sidebar
+document.addEventListener('DOMContentLoaded', () => {
+    // Fechar ao clicar no overlay
+    const overlay = document.getElementById('sidebarOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Fechar ao clicar no botão X
+    const closeBtn = document.getElementById('sidebarClose');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Fechar ao clicar em qualquer link do menu (já existe, mas garantindo)
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+    });
+    
+    // Fechar ao pressionar ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+});
 
 // ========================================
 // CONTROLE DE MÊS

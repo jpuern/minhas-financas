@@ -1493,3 +1493,86 @@ form {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
 }
+
+/* ========================================
+   SIDEBAR MOBILE - CORREÇÕES
+======================================== */
+
+/* Botão de fechar (escondido no desktop) */
+.sidebar-close {
+    display: none;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    z-index: 10;
+}
+
+.sidebar-close:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* Overlay escuro */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    /* Sidebar fixo e fora da tela */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height para mobile */
+        width: 280px;
+        transform: translateX(-100%);
+        z-index: 100;
+        overflow-y: auto;
+        overscroll-behavior: contain; /* Previne scroll do body */
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    /* Mostra botão de fechar no mobile */
+    .sidebar-close {
+        display: flex;
+    }
+    
+    /* Ajusta logo para não sobrepor o botão X */
+    .sidebar .logo {
+        padding-right: 50px;
+    }
+    
+    /* Previne scroll do body quando sidebar está aberto */
+    body.sidebar-open {
+        overflow: hidden;
+    }
+}
